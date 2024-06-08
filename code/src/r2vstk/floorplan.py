@@ -294,16 +294,16 @@ class WallLinkageGraph:
                 for hole in wall.holes:
                     hole_start_point = wall_start_point + wall_direction * hole.min_x
                     hole_end_point = wall_start_point + wall_direction * hole.max_x
-                    draw.line((offset_x + np.asscalar(hole_start_point[0]), offset_y + np.asscalar(hole_start_point[1]),
-                               offset_x + np.asscalar(hole_end_point[0]), offset_y + np.asscalar(hole_end_point[1])), fill=selection_fill,
+                    draw.line((offset_x + hole_start_point[0].item(), offset_y + hole_start_point[1].item(),
+                               offset_x + hole_end_point[0].item(), offset_y + hole_end_point[1].item()), fill=selection_fill,
                               width=WALL_LINKAGE_SKETCH_HOLE_HIGHLIGHT_WIDTH)
                     h_color = hole_color
                     if hole.type == "door":
                         h_color = door_color
                     elif hole.type == "window":
                         h_color = window_color
-                    draw.line((offset_x + np.asscalar(hole_start_point[0]), offset_y + np.asscalar(hole_start_point[1]),
-                               offset_x + np.asscalar(hole_end_point[0]), offset_y + np.asscalar(hole_end_point[1])), fill=h_color,
+                    draw.line((offset_x + hole_start_point[0].item(), offset_y + hole_start_point[1].item(),
+                               offset_x + hole_end_point[0].item(), offset_y + hole_end_point[1].item()), fill=h_color,
                               width=WALL_LINKAGE_SKETCH_THICK_HOLE_WIDTH)
 
             else:
@@ -322,6 +322,6 @@ class WallLinkageGraph:
                     elif hole.type == "window":
                         h_color = window_color
 
-                    draw.line((offset_x + np.asscalar(hole_start_point[0]), offset_y + np.asscalar(hole_start_point[1]),
-                               offset_x + np.asscalar(hole_end_point[0]), offset_y + np.asscalar(hole_end_point[1])), fill=h_color,
+                    draw.line((offset_x + hole_start_point[0].item(), offset_y + hole_start_point[1].item(),
+                               offset_x + hole_end_point[0].item(), offset_y + hole_end_point[1].item()), fill=h_color,
                               width=WALL_LINKAGE_SKETCH_HOLE_WIDTH)
