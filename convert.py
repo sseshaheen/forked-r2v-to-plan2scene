@@ -81,26 +81,21 @@ def run(conf: ConfigManager, source, output_path, scale_factor, save_previews,
             logging.info("Saved {file}".format(file=os.path.join(output_path, "room_" + str(i) + ".json")))
 
     # Save scene.json
-    try:
-        scene_json = house.get_scene_json(conf, adjust_short_walls=adjust_short_walls)
-        save_path = os.path.join(output_path, scene_json["scene"]["arch"]["id"] + ".scene.json")
-        with open(save_path, "w") as f:
-            f.write(json.dumps(scene_json, indent=3))
-        logging.info("Saved scene.json to {file}".format(file=save_path))
-    except Exception as e:
-        logging.error(f"Failed to save scene.json: {e}")
+    scene_json = house.get_scene_json(conf, adjust_short_walls=adjust_short_walls)
+    scene_save_path = os.path.join(output_path, scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"] + ".scene.json")
+    with open(scene_save_path, "w") as f:
+        f.write(json.dumps(scene_json, indent=3))
+    logging.info("Saved scene.json to {file}".format(file=scene_save_path))
 
     # Save objectaabb.json
-    try:
-        object_aabb_json = house.get_objectaabb_json(conf)
-        save_path = os.path.join(output_path, scene_json["scene"]["arch"]["id"] + ".objectaabb.json")
-        with open(save_path, "w") as f:
-            f.write(json.dumps(object_aabb_json, indent=3))
-        logging.info("Saved objectaabb.json to {file}".format(file=save_path))
-    except Exception as e:
-        logging.error(f"Failed to save objectaabb.json: {e}")
+    object_aabb_json = house.get_objectaabb_json(conf)
+    objectaabb_save_path = os.path.join(output_path, scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"] + ".objectaabb.json")
+    with open(objectaabb_save_path, "w") as f:
+        f.write(json.dumps(object_aabb_json, indent=3))
+    logging.info("Saved objectaabb.json to {file}".format(file=objectaabb_save_path))
 
     return house
+
 
 
 def run_args(conf: ConfigManager, args):
