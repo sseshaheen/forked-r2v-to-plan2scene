@@ -91,7 +91,7 @@ def run(conf: ConfigManager, source, output_path, scale_factor, save_previews,
 
     # Save objectaabb.json
     object_aabb_json = house.get_objectaabb_json(conf)
-    objectaabb_save_path = os.path.join(output_path + scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"] + ".objectaabb.json")
+    objectaabb_save_path = os.path.join(output_path, scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"] + ".objectaabb.json")
     with open(objectaabb_save_path, "w") as f:
         f.write(json.dumps(object_aabb_json, indent=3))
     logging.info("Saved objectaabb.json to {file}".format(file=objectaabb_save_path))
