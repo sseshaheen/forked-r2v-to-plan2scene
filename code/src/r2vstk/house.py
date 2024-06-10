@@ -846,8 +846,22 @@ class House:
                     room_type_candidates.append(wall.right_room_type)
                 # print(should_swap_wall_endpoints)
             room_type_candidates = list(set(room_type_candidates))
-            # assert len(room_type_candidates) == 1  # Test for consistent room type assignment
-            assert room_type_candidates[0] != "outside"
+            
+            # Log the room key and the room type candidates for debugging
+            logging.info(f"Room key: {room_key}, Room type candidates: {room_type_candidates}")
+
+            # Check if room_type_candidates list is empty
+            if not room_type_candidates:
+                logging.error(f"Room key: {room_key} has no room type candidates")
+                continue
+            
+            # Log the first room type candidate
+            logging.info(f"First room type candidate for room key {room_key}: {room_type_candidates[0]}")
+            
+            # Handle case where room type is "outside" gracefully
+            if room_type_candidates[0] == "outside":
+                logging.warning(f"Room key: {room_key} has 'outside' as a room type candidate. Skipping this room.")
+                continue
 
             rd.room_id = generate_room_id(room_key, self.ordered_rooms)
             rd.room_types = [AABBAnnotation(a) for a in room_type_candidates]
