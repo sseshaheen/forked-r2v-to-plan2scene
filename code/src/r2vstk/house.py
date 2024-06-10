@@ -27,6 +27,7 @@ class House:
     """
 
     def __init__(self):
+        logging.debug("Initializing House object")
         # Configuration
         self.file_name = None
         self.multiplication_factor = 1  # Scale factor to real world
@@ -59,6 +60,7 @@ class House:
         Load a parsed r2v file.
         :param data: Parsed R2V tsv file.
         """
+        logging.debug("Loading data")
         self.walls = [x for x in data if x["category"] == "wall"]
         self.raw_objects = [r for r in data if r["category"] not in ["wall", "door", "entrance"]]
         self.openings = [x for x in data if x["category"] == "door"]
@@ -73,12 +75,15 @@ class House:
         self.x_max = max([x["x_min"] for x in data] + [x["x_max"] for x in data])
         self.y_max = max([x["y_min"] for x in data] + [x["y_max"] for x in data])
 
+        logging.debug(f"Loaded data: x_min={self.x_min}, y_min={self.y_min}, x_max={self.x_max}, y_max={self.y_max}")
+
     def load_r2v_output_file(self, conf: ConfigManager, source_path: str) -> None:
         """
         Load a raster-to-vector output file.
         :param conf: Config Manager
         :param source_path: Path to r2v file.
         """
+        logging.info(f"Loading R2V output file from {source_path}")
         category_list = conf.room_types
         data = []
         self.file_name = source_path
@@ -121,6 +126,7 @@ class House:
         Load a raster-to-vector annotation file.
         :param source_path: Path to raster-to-vector annotation file.
         """
+        logging.info(f"Loading R2V annotation file from {source_path}")
         data = []
         self.file_name = source_path
 
@@ -145,6 +151,7 @@ class House:
         :param conf: ConfigManager
         """
         # Method adapted from raster-to-vector project.
+        logging.info("Splitting source walls")
         start_over = False
         changed = True
         left_iterations = conf.parser_config.split_walls.max_iter
@@ -244,6 +251,7 @@ class House:
         """
         Computer room-door-room connectivity graph
         """
+        logging.info("Computing room-door-room (RDR) connectivity graph")
         for wall in self.wall_graph.walls:
             for hole in wall.holes:
                 assert isinstance(hole, Hole)
@@ -262,6 +270,7 @@ class House:
         """
         Classify openings as doors and windows.
         """
+        logging.info("Classifying doors and windows")
         for wall in self.wall_graph.walls:
             # Check whether wall is internal
             wall_internal = False
@@ -309,7 +318,7 @@ class House:
         Axis-align walls that are nearly axis aligned.
         :param conf: Config Manager
         """
-
+        logging.info("Straightening walls")
         straighten_walls_cutoff_gradient = conf.parser_config.straighten_walls.cutoff_gradient
         max_iter_count = conf.parser_config.straighten_walls.max_iter
         iter_count = 0
@@ -367,6 +376,7 @@ class House:
         The room detection algorithm erroneously detect the outer perimeter as a room. This method removes that 'false' room.
         :param conf: ConfigManager
         """
+        logging.info("Eliminating false rooms")
         eliminate_false_rooms_threshold = conf.parser_config.eliminate_false_rooms.threshold
         fully_contained_keys = []
         for parent_candidate_key in self.room_description_map:
@@ -377,7 +387,7 @@ class House:
             try:
                 parent_polygon = Polygon(parent_polyline)
             except:
-                logging.error("exception in processing " + self.file_name, exc_info=1)
+                logging.error("Exception in processing " + self.file_name, exc_info=1)
                 continue
 
             for child_candidate_key in self.room_description_map:
@@ -389,7 +399,7 @@ class House:
                 try:
                     child_polygon = Polygon(child_polyline)
                 except:
-                    logging.error("exception in processing " + self.file_name, exc_info=1)
+                    logging.error("Exception in processing " + self.file_name, exc_info=1)
                     continue
 
                 intersection = parent_polygon.intersection(child_polygon)
@@ -409,6 +419,7 @@ class House:
         Generate wall-corner-wall linkage graph
         :param conf: Config Manager
         """
+        logging.info("Generating wall graph")
         self.wall_graph = WallLinkageGraph(conf.parser_config.wall_join_margin)
         for wall in self.walls:
             left_room_type = None
@@ -468,6 +479,7 @@ class House:
         Populate the list of object annotations
         :param conf: ConfigManager
         """
+        logging.info("Populating object annotations")
         self.object_annotations = []
         for ro in self.raw_objects:
             if ro["category"] in conf.room_types:
@@ -481,6 +493,7 @@ class House:
         """
         Returns the shapely shape containing walls. The windows and doors are depicted by holes. This mask can be used for 2D ray hit tests.
         """
+        logging.info("Getting wall mask")
         processed_walls = []
         all_lines = []
         for room_key in self.room_description_map:
@@ -513,6 +526,7 @@ class House:
         Populate room_key -> annotations map that indicate AABB annotations assigned to each room.
         :param conf: ConfigManager
         """
+        logging.info("Populating room annotations")
         annotations = []
         for ro in self.raw_room_annotations:
             obj = AABBAnnotation(ro["category"])
@@ -541,6 +555,7 @@ class House:
         :param adjust_short_walls: Specify true to make certain walls short. (E.g. balconies)
         :return: Tuple of (An arch.json file describing the room, dictionary of newly added walls)
         """
+        logging.info(f"Getting JSON for room {room_key}")
         if skip_walls is None:
             skip_walls = {}
 
@@ -617,6 +632,7 @@ class House:
         :param conf: Config Manager
         :return: objectaabb.json file.
         """
+        logging.info("Generating object AABB JSON")
         result_objects = []
         for obj in self.object_annotations:
             result_objects.append({
@@ -643,6 +659,7 @@ class House:
         :param adjust_short_walls: Specify true to keep certain walls short (e.g. balconies)
         :return: Scene.json file
         """
+        logging.info("Generating scene JSON")
         arch_json = self.get_arch_json(conf, adjust_short_walls=adjust_short_walls)
         filtered_arch_json = {"elements": arch_json["elements"], "defaults": arch_json["defaults"], "rooms": arch_json["rooms"], "rdr": arch_json["rdr"],
                               "id": arch_json["id"]}
@@ -669,6 +686,7 @@ class House:
         :param adjust_short_walls: Specify true to keep certain walls short (e.g. balconies)
         :return: arch.json file
         """
+        logging.info("Generating arch JSON")
         elements = []
         skip_walls = {}  # Avoid duplicating of walls that are shared between multiple rooms.
 
@@ -742,6 +760,7 @@ class House:
         :param conf: ConfigManager
         :param path: Path to save output sketch.
         """
+        logging.info(f"Sketching raw annotations to {path}")
 
         fnt = ImageFont.truetype(conf.data_paths.pil_font.path, conf.data_paths.pil_font.size)
 
@@ -786,6 +805,8 @@ class House:
         :param room_key: Key of interested room
         :param path: Path to save sketch
         """
+        logging.info(f"Sketching room annotations for room {room_key} to {path}")
+
         fnt = ImageFont.truetype(conf.data_paths.pil_font.path, conf.data_paths.pil_font.size)
 
         offset_x = -self.x_min + ROOM_SKETCH_MARGIN
@@ -824,6 +845,7 @@ class House:
         """
         Populate room description map from raster-to-vector outputs.
         """
+        logging.info("Populating room descriptions from R2V output")
         # Identify room types of each room
         for room_key, rd in self.room_description_map.items():
             room_type_candidates = []
@@ -836,6 +858,7 @@ class House:
                 elif next_wall.p2 == wall.p1 or next_wall.p2 == wall.p2:
                     next_wall_connection = next_wall.p2
                 else:
+                    logging.error(f"Next wall connection not found for wall: {wall} and next wall: {next_wall}")
                     assert False
 
                 if wall.p2 != next_wall_connection:
@@ -844,9 +867,11 @@ class House:
                 else:
                     should_swap_wall_endpoints = False
                     room_type_candidates.append(wall.right_room_type)
-                # print(should_swap_wall_endpoints)
-            room_type_candidates = list(set(room_type_candidates))
+
+                logging.debug(f"Should swap wall endpoints: {should_swap_wall_endpoints}")
             
+            room_type_candidates = list(set(room_type_candidates))
+
             # Log the room key and the room type candidates for debugging
             logging.info(f"Room key: {room_key}, Room type candidates: {room_type_candidates}")
 
@@ -864,6 +889,8 @@ class House:
                 continue
 
             rd.room_id = generate_room_id(room_key, self.ordered_rooms)
+            if rd.room_id is None:
+                logging.warning(f"Room key: {room_key} could not generate a valid room ID")
             rd.room_types = [AABBAnnotation(a) for a in room_type_candidates]
 
     def populate_room_descriptions_from_r2v_annot(self, conf: ConfigManager) -> None:
@@ -871,6 +898,7 @@ class House:
         Populate room description map from raster-to-vector annotations.
         :param conf: ConfigManager
         """
+        logging.info("Populating room descriptions from R2V annotations")
         for room_key, rd in self.room_description_map.items():
             rd.room_id = generate_room_id(room_key, self.ordered_rooms)
             for annotation in rd.annotations:
