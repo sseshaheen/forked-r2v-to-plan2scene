@@ -84,14 +84,14 @@ def run(conf: ConfigManager, source, output_path, scale_factor, save_previews,
 
     # Save scene.json
     scene_json = house.get_scene_json(conf, adjust_short_walls=adjust_short_walls)
-    scene_save_path = os.path.join(output_path, scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"] + ".scene.json")
+    scene_save_path = os.path.join('floorplan_' + scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"] + ".scene.json")
     with open(scene_save_path, "w") as f:
         f.write(json.dumps(scene_json, indent=3))
     logging.info("Saved scene.json to {file}".format(file=scene_save_path))
 
     # Save objectaabb.json
     object_aabb_json = house.get_objectaabb_json(conf)
-    objectaabb_save_path = os.path.join(output_path, scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"] + ".objectaabb.json")
+    objectaabb_save_path = os.path.join('floorplan_' + scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"] + ".objectaabb.json")
     with open(objectaabb_save_path, "w") as f:
         f.write(json.dumps(object_aabb_json, indent=3))
     logging.info("Saved objectaabb.json to {file}".format(file=objectaabb_save_path))
