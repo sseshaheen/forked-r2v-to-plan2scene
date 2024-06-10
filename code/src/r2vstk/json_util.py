@@ -90,6 +90,10 @@ def generate_ceiling_json(conf: ConfigManager, polyline, room_id: str, multiplic
     :param multiplication_factor: Scale factor to real-world
     :return: Json description of the ceiling
     """
+    if room_id is None:
+        logging.error("Cannot generate ceiling JSON: room_id is None")
+        return {}
+
     r = {
         "id": room_id + "_c",
         "roomId": room_id,
