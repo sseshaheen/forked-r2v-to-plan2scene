@@ -81,6 +81,7 @@ def run(conf: ConfigManager, source, output_path, scale_factor, save_previews,
             logging.info("Saved {file}".format(file=os.path.join(output_path, "room_" + str(i) + ".json")))
 
     logging.info(f"output_path: {output_path}")
+    logging.info(f"os path join output_path: {os.path.join('floorplan_' + scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"] + ".scene.json")}")
 
     # Save scene.json
     scene_json = house.get_scene_json(conf, adjust_short_walls=adjust_short_walls)
