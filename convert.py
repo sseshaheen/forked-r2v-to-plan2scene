@@ -80,6 +80,8 @@ def run(conf: ConfigManager, source, output_path, scale_factor, save_previews,
                 f.write(json.dumps(room_json, indent=3))
             logging.info("Saved {file}".format(file=os.path.join(output_path, "room_" + str(i) + ".json")))
 
+    logging.info(f"output_path: {output_path}")
+
     # Save scene.json
     scene_json = house.get_scene_json(conf, adjust_short_walls=adjust_short_walls)
     scene_save_path = os.path.join(output_path, scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"] + ".scene.json")
@@ -89,7 +91,7 @@ def run(conf: ConfigManager, source, output_path, scale_factor, save_previews,
 
     # Save objectaabb.json
     object_aabb_json = house.get_objectaabb_json(conf)
-    objectaabb_save_path = os.path.join(output_path, scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"] + ".objectaabb.json")
+    objectaabb_save_path = os.path.join(output_path + scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"], scene_json["scene"]["arch"]["id"] + ".objectaabb.json")
     with open(objectaabb_save_path, "w") as f:
         f.write(json.dumps(object_aabb_json, indent=3))
     logging.info("Saved objectaabb.json to {file}".format(file=objectaabb_save_path))
