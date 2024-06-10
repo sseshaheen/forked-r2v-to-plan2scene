@@ -562,6 +562,15 @@ class House:
         added_walls = {}
         room_walls = self.room_description_map[room_key].walls
         room_id = self.room_description_map[room_key].room_id
+
+        # Generate a room_id if it's None
+        if room_id is None:
+            logging.warning(f"Room ID is None for room {room_key}. Generating a new room ID.")
+            room_id = generate_room_id(room_key, self.ordered_rooms)
+            if room_id is None:
+                logging.error(f"Failed to generate a room ID for room {room_key}. Skipping this room.")
+                return {}, added_walls
+
         polyline = get_polyline(room_walls)
 
         # Detect balcony rooms
